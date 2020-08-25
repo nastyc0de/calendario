@@ -20,10 +20,20 @@ const customStyles = {
 
 const now = moment().minutes(0).seconds(0).add(1, 'hours');
 const end = now.clone().add(1,'hours');
+const options = {
+    position: "top-center",
+    autoClose: 3000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+}
 
 export const CalendarModal = () => {
     const [dateStart, setDateStart] = useState(now.toDate());
     const [dateEnd, setDateEnd] = useState(end.toDate());
+    const [isValid, setIsValid] = useState(true);
 
     const [formValues, setFormValues] = useState({
         title: 'Evento',
@@ -62,16 +72,14 @@ export const CalendarModal = () => {
 
         if (momentStart.isSameOrAfter(momentEnd)) {
             console.log("error");
-            return toast.info('🦄 La fecha final debe ser mayor a la fecha de inicio', {
-                position: "top-center",
-                autoClose: 3000,
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                progress: undefined,
-                });
+            return toast.error('La fecha final debe ser mayor a la fecha de inicio', options);
         }
+        if (title.trim().length < 2) {
+            return setIsValid(false);
+        }
+
+        setIsValid(true);
+        closeModal();
     }
 
     return (
@@ -111,30 +119,20 @@ export const CalendarModal = () => {
                         className="form-control"
                     />
                 </div>
-                    <ToastContainer
-                        position="top-center"
-                        autoClose={3000}
-                        hideProgressBar={false}
-                        newestOnTop={false}
-                        closeOnClick
-                        rtl={false}
-                        pauseOnFocusLoss
-                        draggable
-                        pauseOnHover
-                    />
+                    <ToastContainer/>
                 <hr />
-                <div className="form-group">
+                <div className={`form-group ${!isValid &&'has-danger'}`}>
                     <label>Titulo y notas</label>
                     <input 
                         type="text" 
-                        className="form-control"
+                        className={`form-control ${!isValid &&'is-invalid'}`}
                         placeholder="Título del evento"
                         name="title"
                         autoComplete="off"
                         value={title}
                         onChange={handleInputChange}
                     />
-                    <small id="emailHelp" className="form-text text-muted">Una descripción corta</small>
+                    <div class="invalid-feedback">Ingrese un titulo</div>
                 </div>
 
                 <div className="form-group">
